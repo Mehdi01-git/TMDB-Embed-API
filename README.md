@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Node.js-18%2B-brightgreen?style=flat" />
   <img src="https://img.shields.io/badge/Status-Active-success?style=flat" />
   <img src="https://img.shields.io/badge/License-MIT-blue?style=flat" />
-  <img src="https://img.shields.io/badge/Version-1.0.8-informational?style=flat" />
+  <img src="https://img.shields.io/badge/Version-1.0.9-informational?style=flat" />
   <img src="https://img.shields.io/docker/pulls/inside4ndroid/tmdb-embed-api?label=Docker%20Pulls&style=flat" />
 </p>
 
@@ -34,7 +34,7 @@
 
 ## ✨ Features
 - **Multi‑TMDB Key Rotation** – Supply multiple API keys; one is chosen randomly per request.
-- **Provider Aggregation** – Pluggable providers (Showbox, 4khdhub, MoviesMod, MP4Hydra, VidZee, Vixsrc, UHDMovies) with per‑provider enable toggles + default selection.
+- **Provider Aggregation** – Pluggable providers (4khdhub, MoviesMod, MP4Hydra, VidZee, Vixsrc, UHDMovies) with per‑provider enable toggles + default selection.
 - **🔥 Plugin System** – Drop new provider files in `providers/` and add its exported function to the registry map (`providers/registry.js` → `providerFunctionMap`).
 - **Dynamic Filtering** – Minimum quality presets, custom JSON quality map, codec exclusion rules (presets + JSON).
 - **Runtime Overrides UI** – Fully interactive web admin at `/` (login protected) writing to `utils/user-config.json`.
@@ -130,7 +130,6 @@ docker compose up -d --build
 Environment variables can be supplied via a `.env` file in the same directory (Compose automatically loads it). Example `.env`:
 ```
 TMDB_API_KEY=first_key
-FEBBOX_COOKIES=cookie1,cookie2
 ```
 
 To stop & remove:
@@ -153,7 +152,6 @@ or add / remove keys inside the Admin UI (Keys panel) and save.
 | `API_PORT` | Port the server listens on | Defaults to 8787 |
 | `TMDB_API_KEY` | Single TMDB key (legacy) | Use if you only have one key |
 | `TMDB_API_KEYS` | JSON array of keys | Overrides single key when present |
-| `FEBBOX_COOKIES` | Comma separated FebBox cookies | Enables Showbox provider immediately |
 | `PASSWORD_HASH` | Pre-seed admin password hash | Optional (UI can set) |
 | `ADMIN_USERNAME` | Override default username | Default: `admin` |
 
@@ -201,9 +199,9 @@ Saving in the UI writes only changed keys. Setting a field to empty removes the 
 **Override File:** `utils/user-config.json`
 ```json
 {
-  "defaultProviders": ["showbox","4khdhub"],
+  "defaultProviders": ["4khdhub","moviesmod"],
   "tmdbApiKeys": ["KEY_A","KEY_B"],
-  "enableShowboxProvider": true
+  "enable4khdhubProvider": true
 }
 ```
 
@@ -215,7 +213,6 @@ Saving in the UI writes only changed keys. Setting a field to empty removes the 
 | Core | Port, default providers, default region |
 | Quality / Filters | Min quality presets & codec exclusion JSON |
 | Keys | Add/remove TMDB API keys (rotated randomly) |
-| FebBox / PStream | Manage FebBox cookies powering Showbox provider |
 | Advanced | Provider toggles, cache & validation flags |
 | Server Status | Live metrics, provider functional checks |
 | Live Config | View merged + override JSON snapshots |
@@ -228,7 +225,6 @@ Session is revalidated on visibility and back/forward navigation to prevent stal
 The API supports a plugin system. Drop a new provider file in the `providers/` folder and register its exported function in `providers/registry.js` under `providerFunctionMap`.
 
 ### Current Built-in Providers
-- `showbox` - Showbox/PStream integration
 - `4khdhub` - 4KHDHub streams
 - `moviesmod` - MoviesMod streams  
 - `mp4hydra` - MP4Hydra streams
@@ -244,7 +240,6 @@ The API supports a plugin system. Drop a new provider file in the `providers/` f
    ```js
    // providers/registry.js
    const providerFunctionMap = {
-     'Showbox.js': 'getStreamsFromTmdbId',
      '4khdhub.js': 'get4KHDHubStreams',
      'moviesmod.js': 'getMoviesModStreams',
      'MP4Hydra.js': 'getMP4HydraStreams',
@@ -320,9 +315,7 @@ Filtering passes through `applyFilters` to enforce min quality + codec exclusion
 ## ⚙️ Configuration Flags (Advanced Panel)
 | Flag | Default | Purpose |
 |------|---------|---------|
-| disableCache | false | Disables internal caches (Showbox + proxy segment cache) |
-| enablePStreamApi | true | Enables Showbox PStream-specific handling |
-| disableUrlValidation | false | Skip general URL pattern validation checks |
+| disableCache | false | Disables internal caches |\n| disableUrlValidation | false | Skip general URL pattern validation checks |
 | disable4khdhubUrlValidation | false | Skip 4khdhub-specific URL validation |
 | enableProxy | false | Mounts proxy routes and rewrites stream URLs through them |
 
@@ -334,7 +327,7 @@ Toggle `enableProxy` to activate the internal proxy. This adds lightweight playl
 - Presets: `all`, `480p`, `720p`, `1080p`, `1440p`, `2160p`.
 - Custom quality JSON example:
 ```json
-{ "default": "900p", "showbox": "1080p" }
+{ "default": "900p", "4khdhub": "1080p" }
 ```
 - Codec exclusion JSON example:
 ```json
@@ -367,7 +360,6 @@ For ephemeral platforms (e.g., Vercel) note that some providers use temporary di
 ## 💡 Troubleshooting
 | Symptom | Cause / Fix |
 |---------|------------|
-| No streams from Showbox | Missing FebBox cookies |
 | TMDB quota issues | Add more keys under Keys panel |
 | Provider missing in matrix | Ensure its enable flag exists & UI updated |
 | Empty merged config after restart | `user-config.json` deleted or unreadable |

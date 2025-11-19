@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.9] - 2025-11-19
+
+### Removed
+- **Showbox/FebBox/PStream provider**: Permanently removed due to PStream API being protected by Cloudflare bot detection, making it inaccessible without complex proxy infrastructure
+  - Deleted `providers/Showbox.js` and backup files
+  - Removed FebBox cookie management from configuration panel
+  - Removed `FEBBOX_COOKIES`, `SHOWBOX_CACHE_DIR`, and related environment variables
+  - Cleaned up all Showbox-specific logic from provider registry
+  - Removed FebBox/PStream configuration UI panel and related functions
+- **Unused dependencies**: Removed 121 packages including puppeteer, patchright, puppeteer-extra, puppeteer-extra-plugin-stealth, and vm2 (~200MB+ saved)
+- **Unused utility files**: Removed `cloudflareBypasser.js` and `jsunpack.js`
+
+### Fixed
+- **VidZee provider**: Updated to support two-stage AES decryption with dynamic API keys. The provider now fetches an encrypted key from `https://core.vidzee.wtf/api-key`, decrypts it using AES-256-GCM with a hardcoded key, then uses the result to decrypt video URLs with AES-256-CBC. Includes 1-hour API key caching for performance.
+- **4khdhub provider**: Added support for `links.modpro.blog` domain (site migrated from `modrefer.in`).
+- **moviesmod provider**: Added support for `links.modpro.blog` domain alongside existing `modrefer.in`.
+- **uhdmovies provider**: Fixed domain to use `uhdmovies.rip` instead of outdated `uhdmovies.mov`. Added automatic domain replacement for stale scraped URLs. Created new `utils/linkResolver.js` utility to handle driveseed/driveleech download button extraction (supports Instant Download, Resume Cloud, Resume Worker Bot, Direct Links CF Type 1).
+- **Provider registry**: Fixed `listProviders()` to return all available providers with their enabled status, not just enabled ones. Config panel now shows all 6 providers correctly.
+
 ## [1.0.8] - 2025-10-03
 
 ### Added
