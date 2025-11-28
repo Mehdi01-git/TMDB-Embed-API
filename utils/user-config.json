@@ -13,7 +13,7 @@
   "enableMp4hydraProvider": true,
   "enableVidzeeProvider": true,
   "enableVixsrcProvider": true,
-  "enableProxy": false,
+  "enableProxy": true,
   "disableCache": false,
   "enablePStreamApi": true,
   "disableUrlValidation": false,
