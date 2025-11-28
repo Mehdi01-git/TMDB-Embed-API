@@ -1,9 +1,13 @@
 {
   "defaultProviders": [],
   "configVersion": 1,
-  "tmdbApiKeys": [],
+  "tmdbApiKeys": [
+    "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1Y2NkNjMwMTM5M2I5MDRjNGIxYjhlNWIwMGYxMjQwMSIsInN1YiI6IjYyZTY3OWFjMWFkOTNiMDA1OWExYTE4NyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.dsPMV3qAuWXJYJ5fpzwzmuTjzqjZOUkxcrBkw_BUU_U"
+  ],
   "enableShowboxProvider": true,
-  "febboxCookies": [],
+  "febboxCookies": [
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NjQyOTQ1NzUsIm5iZiI6MTc2NDI5NDU3NSwiZXhwIjoxNzk1Mzk4NTk1LCJkYXRhIjp7InVpZCI6MTE3MDY1MiwidG9rZW4iOiJmYTM1YThiNmQ1NmJmZmY0ZWJlZGM5OWFlNGQ2ODQ2OSJ9fQ.slkAmdLExtMPTkhY5sjqigmmnhwKm9c_-ycaAq8AqhY"
+  ],
   "enable4khdhubProvider": true,
   "enableMoviesmodProvider": true,
   "enableMp4hydraProvider": true,
@@ -15,5 +19,6 @@
   "disableUrlValidation": false,
   "disable4khdhubUrlValidation": false,
   "excludeCodecsRaw": "{\"excludeDV\":false,\"excludeHDR\":false}",
-  "minQualitiesRaw": "all"
+  "minQualitiesRaw": "all",
+  "port": 8787
 }
