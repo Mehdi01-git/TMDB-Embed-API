@@ -362,6 +362,79 @@ app.get('/api/streams/:type/:tmdbId', async (req,res) => {
   }
 });
 
+// Vixsrc-specific route (matches /api/vixsrc/movie/:id or /api/vixsrc/tv/:id)
+app.get('/api/:provider/:type/:tmdbId', async (req, res) => {
+  const { provider, type, tmdbId } = req.params;
+  
+  // Validate type
+  if (!['movie', 'tv'].includes(type)) {
+    return res.status(400).json({ success: false, error: 'INVALID_TYPE' });
+  }
+  
+  const season = req.query.season ? Number(req.query.season) : null;
+  const episode = req.query.episode ? Number(req.query.episode) : null;
+  
+  const prov = getProvider(provider);
+  if (!prov) {
+    return res.status(404).json({ success: false, error: 'PROVIDER_NOT_FOUND' });
+  }
+  if (!prov.enabled) {
+    return res.status(503).json({ success: false, error: 'PROVIDER_DISABLED' });
+  }
+  
+  try {
+    metrics.streamRequests++;
+    metrics.providerCalls[prov.name] = (metrics.providerCalls[prov.name] || 0) + 1;
+    
+    const tmdbType = type === 'movie' ? 'movie' : 'tv';
+    const imdbId = await resolveImdbId(tmdbType, tmdbId);
+    if (imdbId) metrics.tmdbToImdbLookups++;
+    
+    const t0 = Date.now();
+    let streams = await prov.fetch({ 
+      tmdbId, 
+      type: type === 'tv' ? 'series' : 'movie', 
+      season, 
+      episode, 
+      imdbId, 
+      filters: {} 
+    });
+    
+    const providerTimings = { [prov.name]: Date.now() - t0 };
+    streams = applyFilters(streams, prov.name, config.minQualities, config.excludeCodecs);
+    metrics.streamsReturned += streams.length;
+    
+    if (config.enableProxy) {
+      const serverUrl = `${req.protocol}://${req.get('host')}`;
+      streams = processStreamsForProxy(streams, serverUrl);
+      streams = streams.map(s => {
+        if (s && typeof s === 'object') {
+          const { headers, ...rest } = s;
+          return rest;
+        }
+        return s;
+      });
+    }
+    
+    res.json({
+      success: true,
+      provider: prov.name,
+      tmdbId,
+      imdbId,
+      count: streams.length,
+      providerTimings,
+      streams
+    });
+  } catch (e) {
+    metrics.lastError = e.message;
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: e.message
+    });
+  }
+});
+
 // Provider-specific streams
 app.get('/api/streams/:provider/:type/:tmdbId', async (req,res) => {
   const { provider, type, tmdbId } = req.params;
